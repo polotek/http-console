@@ -90,6 +90,23 @@ When issuing *POST* and *PUT* commands, we have the opportunity to send data too
 
     http://127.0.0.1:5984/> /rabbits
     http://127.0.0.1:5984/rabbits> POST
+    ... name=Roger&hair=black
+
+    HTTP/1.1 201 Created
+    Location: http://127.0.0.1/rabbits/2fd9db055885e6982462a10e54003127
+    Date: Mon, 31 May 2010 05:09:15 GMT
+    Content-Length: 95
+
+    {
+        ok: true,
+        id: "2fd9db055885e6982462a10e54003127",
+        rev: "1-0c3db91854f26486d1c3922f1a651d86"
+    }
+This data is formatted as url-encoded parameters. But the *POST* takes whatever raw data you 
+pass. Here's an example sending json
+
+    http://127.0.0.1:5984/> /rabbits
+    http://127.0.0.1:5984/rabbits> POST
     ... {"name":"Roger"}
 
     HTTP/1.1 201 Created
@@ -106,9 +123,11 @@ When issuing *POST* and *PUT* commands, we have the opportunity to send data too
 Make sure you have your `Content-Type` header set properly, if the API requires it. More
 in the section below.
 
-> Note that if you're trying to POST to a form handler, you'll most probably want to send data
-in `multipart/form-data` format, such as `name=roger&hair=black`. http-console sends your POST/PUT data *as is*,
-so make sure you've got the format right, and the appropriate `Content-Type` header.
+**Note:** If you're trying to POST to a form handler, you probably want url-encoded data such
+as `name=Roger&hair=black`. You'll probably also need to set the common ccontent type 
+`application/x-www-form-urlencoded`. For json encoded data, you may want the content type 
+`application/json`. Http-console sends your POST/PUT data *as is*, so make sure you've got the
+format right, and the appropriate `Content-Type` header.
 
 ### setting headers #
 
@@ -117,8 +136,8 @@ Sometimes, it's useful to set HTTP headers:
     http://127.0.0.1:5984/> Accept: application/json
     http://127.0.0.1:5984/> X-Lodge: black
 
-These headers are sent with all requests in this session. To see all active headers,
-run the `.headers` command:
+These headers are saved and sent with all requests in this session unless they are changed. To
+see all active headers, run the `.headers` command:
 
     http://127.0.0.1:5984/> .headers
     Accept: application/json
@@ -129,6 +148,9 @@ Removing headers is just as easy:
     http://127.0.0.1:5984/> Accept:
     http://127.0.0.1:5984/> .headers
     X-Lodge: black
+    
+**Note:** This command won't work for removing the `Cookie:` header. That is managed by the
+`rememberCookies` option. See the section on cookies below.
 
 Because JSON is such a common data format, http-console has a way to automatically set
 the `Content-Type` header to `application/json`. Just pass the `--json` option when
@@ -141,8 +163,9 @@ starting http-console, or run the `.json` command:
 
 ### cookies #
 
-You can enable cookie tracking with the `--cookies` option flag.
-To see what cookies are stored, use the `.cookies` command.
+Http-console will track cookies by default. You can disable cookie tracking with the
+`--no-cookies` option flag. Use the `--cookies` option flag to explicitly enable cookie 
+tracking. To see what cookies are stored, use the `.cookies` command when running http-console.
 
 ### SSL #
 
